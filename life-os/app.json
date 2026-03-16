@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Life OS",
+    "slug": "life-os",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "life-os",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#FAFAF8",
+      "resizeMode": "contain"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.lifeos.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FAFAF8"
+      },
+      "package": "com.lifeos.app"
+    },
+    "plugins": ["expo-router", "expo-font", "expo-secure-store", "expo-notifications"]
+  }
+}
