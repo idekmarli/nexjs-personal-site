@@ -7,3 +7,4 @@ export { SectionHeader } from './SectionHeader';
 export { EmptyStateCard } from './EmptyStateCard';
 export { LoadingSkeleton } from './LoadingSkeleton';
 export { Spacer } from './Spacer';
+export { TextInput } from './TextInput';

@@ -1,7 +1,21 @@
 import { Redirect } from 'expo-router';
+import { useAuthStore } from '@/stores/auth-store';
+import { BootstrapScreen } from '@/components/BootstrapScreen';
 
 export default function Index() {
-  // In Milestone 2, this will check auth state and redirect accordingly.
-  // For now, go straight to tabs.
+  const { session, isLoading, hasOnboarded } = useAuthStore();
+
+  if (isLoading) {
+    return <BootstrapScreen />;
+  }
+
+  if (!session) {
+    return <Redirect href="/(auth)/sign-in" />;
+  }
+
+  if (!hasOnboarded) {
+    return <Redirect href="/onboarding/welcome" />;
+  }
+
   return <Redirect href="/(tabs)" />;
 }
