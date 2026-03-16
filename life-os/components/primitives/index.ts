@@ -8,3 +8,4 @@ export { EmptyStateCard } from './EmptyStateCard';
 export { LoadingSkeleton } from './LoadingSkeleton';
 export { Spacer } from './Spacer';
 export { TextInput } from './TextInput';
+export { ErrorState } from './ErrorState';
