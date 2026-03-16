@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -7,8 +7,12 @@ import {
   Card,
   SectionHeader,
   EmptyStateCard,
+  PrimaryButton,
+  SecondaryButton,
   Spacer,
 } from '@/components/primitives';
+import { DailyPlanningModal } from '@/components/planning/DailyPlanningModal';
+import { WeeklyResetFlow } from '@/components/planning/WeeklyResetFlow';
 import { colors, spacing } from '@/theme';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -19,7 +23,7 @@ function WeekHeader() {
   const dayOfWeek = today.getDay();
 
   return (
-    <View style={[styles.header, { paddingTop: insets.top + spacing.lg }]}>
+    <View style={{ paddingTop: insets.top + spacing.lg }}>
       <AppText variant="largeTitle">This Week</AppText>
       <Spacer size="lg" />
       <View style={styles.dayRow}>
@@ -45,61 +49,79 @@ function WeekHeader() {
   );
 }
 
-function WeeklyFocusSection() {
-  return (
-    <View style={styles.section}>
-      <SectionHeader title="Weekly Focus" action="Edit" onAction={() => {}} />
-      <EmptyStateCard
-        title="No weekly focus set"
-        description="Complete a Weekly Reset to define your focus"
-        actionLabel="Start Weekly Reset"
-        onAction={() => {}}
-      />
-    </View>
-  );
-}
-
-function OpenLoopsSection() {
-  return (
-    <View style={styles.section}>
-      <SectionHeader title="Open Loops" subtitle="Items needing attention" />
-      <Card variant="flat">
-        <AppText variant="body" color={colors.textTertiary} align="center">
-          Nothing pending
-        </AppText>
-      </Card>
-    </View>
-  );
-}
-
-function DropListSection() {
-  return (
-    <View style={styles.section}>
-      <SectionHeader title="Drop List" subtitle="What you're letting go this week" />
-      <Card variant="outlined">
-        <AppText variant="caption" align="center">
-          Empty — a clean drop list means a clear mind
-        </AppText>
-      </Card>
-    </View>
-  );
-}
-
 export default function WeekScreen() {
+  const [showDailyPlanning, setShowDailyPlanning] = useState(false);
+  const [showWeeklyReset, setShowWeeklyReset] = useState(false);
+
   return (
-    <ScreenContainer>
-      <WeekHeader />
-      <Spacer size="2xl" />
-      <WeeklyFocusSection />
-      <OpenLoopsSection />
-      <DropListSection />
-      <Spacer size="3xl" />
-    </ScreenContainer>
+    <>
+      <ScreenContainer>
+        <WeekHeader />
+        <Spacer size="2xl" />
+
+        <View style={styles.section}>
+          <SectionHeader title="Daily Plan" />
+          <Card variant="elevated" style={styles.planCard}>
+            <AppText variant="body" weight="medium" align="center">
+              Plan your day
+            </AppText>
+            <Spacer size="sm" />
+            <AppText variant="caption" align="center">
+              Create a realistic plan based on your energy and priorities
+            </AppText>
+            <Spacer size="lg" />
+            <PrimaryButton
+              title="Start Planning"
+              onPress={() => setShowDailyPlanning(true)}
+            />
+          </Card>
+        </View>
+
+        <View style={styles.section}>
+          <SectionHeader title="Weekly Focus" />
+          <EmptyStateCard
+            title="No weekly focus set"
+            description="Complete a Weekly Reset to define your focus"
+            actionLabel="Start Weekly Reset"
+            onAction={() => setShowWeeklyReset(true)}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <SectionHeader title="Open Loops" subtitle="Items needing attention" />
+          <Card variant="flat">
+            <AppText variant="body" color={colors.textTertiary} align="center">
+              Nothing pending
+            </AppText>
+          </Card>
+        </View>
+
+        <View style={styles.section}>
+          <SectionHeader title="Drop List" subtitle="What you're letting go" />
+          <Card variant="outlined">
+            <AppText variant="caption" align="center">
+              Empty — a clean drop list means a clear mind
+            </AppText>
+          </Card>
+        </View>
+
+        <Spacer size="3xl" />
+      </ScreenContainer>
+
+      <DailyPlanningModal
+        visible={showDailyPlanning}
+        onClose={() => setShowDailyPlanning(false)}
+      />
+
+      <WeeklyResetFlow
+        visible={showWeeklyReset}
+        onClose={() => setShowWeeklyReset(false)}
+      />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {},
   dayRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -115,5 +137,9 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: spacing['2xl'],
+  },
+  planCard: {
+    alignItems: 'center',
+    paddingVertical: spacing['2xl'],
   },
 });
