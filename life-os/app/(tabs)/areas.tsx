@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -6,25 +6,40 @@ import {
   AppText,
   Card,
   Spacer,
+  LoadingSkeleton,
 } from '@/components/primitives';
-import { colors, spacing } from '@/theme';
+import { AreaDetailModal } from '@/components/areas/AreaDetailModal';
+import { useCategories, useCategoryCounts } from '@/hooks';
+import { Category } from '@/domain/types';
+import { colors, spacing, shadows } from '@/theme';
 
-interface AreaCardProps {
-  icon: string;
-  title: string;
+// Fallback data when categories haven't been loaded from server yet
+const FALLBACK_AREAS = [
+  { icon: '💼', name: 'Business', color: '#5A8EC4' },
+  { icon: '💰', name: 'Money', color: '#6B9B76' },
+  { icon: '🏠', name: 'Home & Life', color: '#C4935A' },
+  { icon: '💪', name: 'Health', color: '#C45A5A' },
+  { icon: '❤️', name: 'Relationships', color: '#B8977E' },
+  { icon: '🌱', name: 'Growth', color: '#7B9B6B' },
+];
+
+function AreaCard({
+  category,
+  itemCount,
+  onPress,
+}: {
+  category: Category;
   itemCount: number;
-  color: string;
-}
-
-function AreaCard({ icon, title, itemCount, color }: AreaCardProps) {
+  onPress: () => void;
+}) {
   return (
-    <Card variant="elevated" style={styles.areaCard} onPress={() => {}}>
-      <View style={[styles.areaIcon, { backgroundColor: color + '15' }]}>
-        <AppText variant="heading">{icon}</AppText>
+    <Card variant="elevated" style={styles.areaCard} onPress={onPress}>
+      <View style={[styles.areaIcon, { backgroundColor: category.color + '15' }]}>
+        <AppText variant="heading">{category.icon}</AppText>
       </View>
       <Spacer size="md" />
       <AppText variant="label" weight="semibold">
-        {title}
+        {category.name}
       </AppText>
       <AppText variant="caption">
         {itemCount} {itemCount === 1 ? 'item' : 'items'}
@@ -33,37 +48,70 @@ function AreaCard({ icon, title, itemCount, color }: AreaCardProps) {
   );
 }
 
-const AREAS: AreaCardProps[] = [
-  { icon: '💼', title: 'Business', itemCount: 0, color: '#5A8EC4' },
-  { icon: '💰', title: 'Money', itemCount: 0, color: '#6B9B76' },
-  { icon: '🏠', title: 'Home & Life', itemCount: 0, color: '#C4935A' },
-  { icon: '💪', title: 'Health', itemCount: 0, color: '#C45A5A' },
-  { icon: '❤️', title: 'Relationships', itemCount: 0, color: '#B8977E' },
-  { icon: '🌱', title: 'Growth', itemCount: 0, color: '#7B9B6B' },
-];
-
 export default function AreasScreen() {
   const insets = useSafeAreaInsets();
+  const { data: categories, isLoading } = useCategories();
+  const { data: counts } = useCategoryCounts();
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   return (
-    <ScreenContainer>
-      <View style={{ paddingTop: insets.top + spacing.lg }}>
-        <AppText variant="largeTitle">Areas</AppText>
-        <AppText variant="body" style={styles.subtitle}>
-          Your whole life, organized
-        </AppText>
-      </View>
+    <>
+      <ScreenContainer>
+        <View style={{ paddingTop: insets.top + spacing.lg }}>
+          <AppText variant="largeTitle">Areas</AppText>
+          <AppText variant="body" style={styles.subtitle}>
+            Your whole life, organized
+          </AppText>
+        </View>
 
-      <Spacer size="2xl" />
+        <Spacer size="2xl" />
 
-      <View style={styles.grid}>
-        {AREAS.map((area) => (
-          <AreaCard key={area.title} {...area} />
-        ))}
-      </View>
+        {isLoading ? (
+          <View style={styles.grid}>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <View key={i} style={styles.areaCard}>
+                <LoadingSkeleton height={120} />
+              </View>
+            ))}
+          </View>
+        ) : categories && categories.length > 0 ? (
+          <View style={styles.grid}>
+            {categories.map((cat) => (
+              <AreaCard
+                key={cat.id}
+                category={cat}
+                itemCount={counts?.[cat.id] ?? 0}
+                onPress={() => setSelectedCategory(cat)}
+              />
+            ))}
+          </View>
+        ) : (
+          // Show fallback static cards when no categories exist yet
+          <View style={styles.grid}>
+            {FALLBACK_AREAS.map((area) => (
+              <Card key={area.name} variant="elevated" style={styles.areaCard}>
+                <View style={[styles.areaIcon, { backgroundColor: area.color + '15' }]}>
+                  <AppText variant="heading">{area.icon}</AppText>
+                </View>
+                <Spacer size="md" />
+                <AppText variant="label" weight="semibold">
+                  {area.name}
+                </AppText>
+                <AppText variant="caption">0 items</AppText>
+              </Card>
+            ))}
+          </View>
+        )}
 
-      <Spacer size="3xl" />
-    </ScreenContainer>
+        <Spacer size="3xl" />
+      </ScreenContainer>
+
+      <AreaDetailModal
+        category={selectedCategory}
+        visible={!!selectedCategory}
+        onClose={() => setSelectedCategory(null)}
+      />
+    </>
   );
 }
 
