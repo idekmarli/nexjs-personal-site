@@ -179,7 +179,7 @@ export function ImageCropper({ visible, imageUri, onClose, onCrop }: ImageCroppe
   const brResponder = useRef(createCornerResponder('bottomRight')).current;
 
   const handleCrop = async () => {
-    if (!imageUri || originalDimensions.width === 0) return;
+    if (!imageUri || originalDimensions.width === 0 || imageLayout.width === 0 || imageLayout.height === 0) return;
 
     setLoading(true);
     try {

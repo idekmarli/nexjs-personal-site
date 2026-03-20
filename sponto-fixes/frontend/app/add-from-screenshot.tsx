@@ -315,9 +315,10 @@ export default function AddFromScreenshotScreen() {
         purchase_price: parseFloat(purchasePrice) || 0,
         target_list_price: parseFloat(listedPrice) || 0,
         platforms: detectedPlatform ? [detectedPlatform.toLowerCase()] : [],
+        color: color.trim(),
         status: 'sourced',
         date_acquired: new Date().toISOString().split('T')[0],
-        notes: notes.trim() + (color ? `\nColor: ${color}` : '') + `\n\n[Extracted from screenshot]`,
+        notes: (notes.trim() ? notes.trim() + '\n\n' : '') + '[Extracted from screenshot]',
         photos: photoToSave ? [photoToSave] : [],
         is_draft: false,
       };
@@ -361,7 +362,8 @@ export default function AddFromScreenshotScreen() {
         platforms: detectedPlatform ? [detectedPlatform.toLowerCase()] : [],
         status: 'sourced',
         date_acquired: new Date().toISOString().split('T')[0],
-        notes: notes.trim() + (color ? `\nColor: ${color}` : '') + `\n\n[Draft - Extracted from screenshot]`,
+        color: color.trim(),
+        notes: (notes.trim() ? notes.trim() + '\n\n' : '') + '[Draft - Extracted from screenshot]',
         photos: await (async () => {
           const raw = croppedImage || selectedImages[0];
           return raw ? [await compressForSave(raw)] : [];
